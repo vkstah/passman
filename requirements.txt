@@ -1,0 +1,7 @@
+typer
+inquirer
+yaspin
+bcrypt
+psycopg2
+python-dotenv
+pyperclip

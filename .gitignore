@@ -1,0 +1,6 @@
+.DS_Store
+.env
+!.env.example
+__pycache__/
+*.spec
+bin/
