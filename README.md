@@ -2,6 +2,10 @@
 
 Passman is a lightweight and ultra-simple password manager built with Python for my personal use.
 
+## Requirements
+
+- Python >= 3.11.4
+
 ## Installation
 
 1. Clone or download this repository to your device.
