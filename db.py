@@ -10,6 +10,7 @@ class Database:
     self.cur.execute("""CREATE TABLE IF NOT EXISTS password (
                 id BIGSERIAL PRIMARY KEY,
                 name VARCHAR(255),
+                username VARCHAR(255),
                 password VARCHAR(255)
     );          
     """)

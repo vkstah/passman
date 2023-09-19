@@ -5,3 +5,5 @@ bcrypt
 psycopg2
 python-dotenv
 pyperclip
+pycryptodome
+pbkdf2
