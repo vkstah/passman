@@ -1,4 +1,5 @@
 from dotenv import dotenv_values
+from db import Database
 import pyperclip
 import inquirer
 import psycopg2
@@ -6,7 +7,7 @@ import bcrypt
 import typer
 
 def main(
-  password: str = typer.Option(..., prompt=True, hide_input=True)
+  password: str = typer.Option(..., prompt="Master Password", hide_input=True)
 ):
   # Bail if no .env is found
   env = dotenv_values('.env')
@@ -14,17 +15,7 @@ def main(
     return
   
   # Establish connection to database
-  conn = psycopg2.connect(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
-  cur = conn.cursor()
-
-  # (Maybe) setup the database
-  cur.execute("""CREATE TABLE IF NOT EXISTS password (
-              id BIGSERIAL PRIMARY KEY,
-              name VARCHAR(255),
-              password VARCHAR(255)
-  );          
-  """)
-  conn.commit()
+  db = Database(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
 
   exit = False
   while not exit:
@@ -45,15 +36,15 @@ def main(
     answers = inquirer.prompt(questions)
 
     if answers.get('selection') == 'view':
-      view(conn, cur)
+      view(db)
 
     if answers.get('selection') == 'exit':
-      cleanup(conn, cur)
+      db.close()
       exit = True
 
-def view(conn, cur):
-  cur.execute("""SELECT * FROM password;""")
-  rows = cur.fetchall()
+def view(db):
+  db.cur.execute("""SELECT * FROM password;""")
+  rows = db.cur.fetchall()
   choices = list(map(lambda x: (x[1], str(x[2])), rows)) + [('Exit', 'exit')]
 
   exit = False
@@ -65,10 +56,6 @@ def view(conn, cur):
       pyperclip.copy(choice)
       print('\033[92m' + 'Copied password to clipboard!' + '\033[0m')
       print()
-
-def cleanup(conn, cur):
-  cur.close()
-  conn.close()
 
 """Check the validity of a password.
 
