@@ -14,10 +14,9 @@ Begin by cloning or downloading this repository to your device.
 git clone git@github.com:vkstah/passman.git
 ```
 
-Install the required dependencies.
+Install all of the required dependencies using `pip`.
 
 ```bash
-# This command will automatically install all required dependencies
 pip install -r requirements.txt
 ```
 
