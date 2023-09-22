@@ -17,8 +17,7 @@ def main(
   # Establish connection to database
   db = Database(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
 
-  exit = False
-  while not exit:
+  while 1:
     salt = bcrypt.gensalt(12)
     hashed = bcrypt.hashpw(password.encode('utf-8'), salt)
 
@@ -40,18 +39,17 @@ def main(
 
     if answers.get('selection') == 'exit':
       db.close()
-      exit = True
+      break
 
 def view(db):
   db.cur.execute("""SELECT * FROM password;""")
   rows = db.cur.fetchall()
   choices = list(map(lambda x: (x[1], str(x[2])), rows)) + [('Exit', 'exit')]
 
-  exit = False
-  while not exit:
+  while 1:
     choice = inquirer.list_input("Select the password to copy it to clipboard", choices=choices)
     if choice == 'exit':
-      exit = True
+      break
     else:
       pyperclip.copy(choice)
       print('\033[92m' + 'Copied password to clipboard!' + '\033[0m')
