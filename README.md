@@ -21,6 +21,16 @@ Install the required dependencies.
 pip install -r requirements.txt
 ```
 
+Finally, define the required environment variables.
+
+```bash
+DB_HOST=""
+DB_NAME=""
+DB_USER=""
+DB_PASSWORD=""
+DB_PORT=""
+```
+
 ## Usage
 
 Under construction. 🔧
