@@ -31,4 +31,4 @@ This password manager is based on Computerphile's detailed explanation of Passwo
 
 ## Troubleshooting
 
-Make sure you have installed a version of Python that is compatible with this project as specified in [Requirements](#requirements).
+Make sure you have installed a version of Python that is compatible with this project as specified in [Requirements](#requirements). Additionally, make sure you have the latest version of this project, and that you have installed the required dependencies as specified in [Installation](#installation).
