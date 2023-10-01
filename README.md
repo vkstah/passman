@@ -1,6 +1,6 @@
-# Passman
+# Vault
 
-Passman is a lightweight and ultra-simple password manager built with Python for my personal use.
+Vault is a lightweight and ultra-simple password manager built with Python for my personal use.
 
 ## Requirements
 
@@ -11,7 +11,7 @@ Passman is a lightweight and ultra-simple password manager built with Python for
 Begin by cloning or downloading this repository to your device.
 
 ```bash
-git clone git@github.com:vkstah/passman.git
+git clone git@github.com:vkstah/vault.git
 ```
 
 Install all of the required dependencies using `pip`.
