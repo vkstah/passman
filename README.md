@@ -28,6 +28,7 @@ DB_NAME="name"
 DB_USER="user"
 DB_PASSWORD="password"
 DB_PORT="5432"
+SECRET_KEY="vr+6,+~aIGc/X9-SIJayGbP+;F+m?E7FMhSW%Tx}C3{Lq:!V4}?-%mA-WBooT(0/"
 ```
 
 ## Usage
