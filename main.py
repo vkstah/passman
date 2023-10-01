@@ -3,35 +3,13 @@ from db import Database
 import threading
 import pyperclip
 import inquirer
-import psycopg2
-import _thread
-import bcrypt
+import threads
 import typer
-import time
 import sys
 
-def worker():
-  counter = 5
-  global reset
-  reset = False
-  while 1:
-    time.sleep(1)
-    counter -= 1
-
-    if counter == 0:
-      print('\033[91m' + "Timed out!" + '\033[0m')
-      sys.exit()
-
-    if reset:
-      counter = 5
-      reset = False
-
-def reset_timer():
-  global reset
-  reset = True
-
 def main(
-  password: str = typer.Option(..., prompt="Master Password", hide_input=True)
+  master_password: str = typer.Option(..., prompt="Master Password", hide_input=True),
+  timeout: int = 90
 ):
   # Bail if no .env is found
   env = dotenv_values('.env')
@@ -41,40 +19,40 @@ def main(
   # Establish connection to database
   db = Database(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
 
-  timer = threading.Thread(target=worker, daemon=False)
-  timer.start()
+  # Create timer thread to timeout the program after X amount of seconds
+  timer_thread = threading.Thread(target=threads.timer, daemon=True, args=(timeout,))
+  timer_thread.start()
 
-  while 1:
-    questions = [
-      inquirer.List(
-        'selection',
-        message="What would you like to do?",
-        choices=[
-          ('View all passwords', 'view'),
-          ('Add new password', 'new'),
-          ('Exit', 'exit')
-        ]
-      )
-    ]
-    answers = inquirer.prompt(questions)
-    if not answers:
-      break
+  choices=[('View all passwords', 'view'), ('Add new password', 'new'), ('Exit', 'exit')]
+  while True:
 
-    if answers.get('selection') == 'view':
-      reset_timer()
+    # Reset timer and maybe timeout after choice
+    threads.reset_timer()
+    choice = inquirer.list_input("What would you like to do?", choices=choices)
+    threads.maybe_timeout(db)
+
+    # Handle choice
+    if choice == 'view':
       view(db)
-
-    if answers.get('selection') == 'exit':
+    elif choice == 'exit':
       db.close()
       break
 
 def view(db):
+
+  # Fetch all passwords from database.
   db.cur.execute("""SELECT * FROM password;""")
   rows = db.cur.fetchall()
-  choices = list(map(lambda x: (x[1], x), rows)) + ['Back']
 
-  while 1:
+  choices = list(map(lambda x: (x[1], x), rows)) + ['Back']
+  while True:
+
+    # Reset timer and maybe timeout after choice
+    threads.reset_timer()
     choice = inquirer.list_input("Please select an entry", choices=choices)
+    threads.maybe_timeout(db)
+
+    # Handle choice
     if choice == 'Back':
       break
     else:
@@ -82,9 +60,14 @@ def view(db):
 
 def entry(entry, db):
   choices = [("Username", "username"), ("Password", "password"), ("Back", "back")]
+  while True:
 
-  while 1:
+    # Reset timer and maybe timeout after choice
+    threads.reset_timer()
     choice = inquirer.list_input(f"Copy {entry[1]}", choices=choices)
+    threads.maybe_timeout(db)
+
+    # Handle choice
     if choice == 'back':
       break
     elif choice == 'username':
@@ -96,5 +79,6 @@ def entry(entry, db):
       print('\033[92m' + f'Copied Password to clipboard!' + '\033[0m')
       print()
 
+# Bootstrap the program
 if __name__ == "__main__":
   typer.run(main)

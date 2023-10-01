@@ -1,4 +1,6 @@
-from Crypto.Hash import SHA256
+from Crypto.Protocol.KDF import PBKDF2
+from dotenv import dotenv_values
+from Crypto.Hash import SHA512
 from Crypto.Cipher import AES
 from Crypto import Random
 import base64
@@ -47,3 +49,17 @@ def decrypt(key, source, decode=True):
 	if data[-padding:] != bytes([padding]) * padding:  # Python 2.x: chr(padding) * padding
 		raise ValueError("Invalid padding...")
 	return data[:-padding]  # remove the padding
+
+def compute_vault_key(master_password):
+	"""Compute the vault key using master password and secret key.
+	
+	Args:
+		master_password (str): The Master password.
+
+	Returns:
+		bytes: The vault key.
+	"""
+	
+	secret_key = dotenv_values(".env").get("SECRET_KEY")
+	vault_key = PBKDF2(master_password.encode(), secret_key.encode(), 32, count=1000000, hmac_hash_module=SHA512)
+	return vault_key
