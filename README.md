@@ -2,6 +2,14 @@
 
 Vault is a lightweight and ultra-simple password manager built with Python for my personal use.
 
+## Features
+
+Under construction. 🔧
+
+- Add, edit or remove credentials
+- Copy credentials to clipboard without ever displaying them on the terminal
+- Automatic script timeout after X amount of seconds for additional layer of security
+
 ## Requirements
 
 - Python >= 3.11.4
