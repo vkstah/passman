@@ -2,11 +2,17 @@ import time
 import sys
 
 def timer(timeout):
-  global reset
-  global timedout
+  """Timer function to be used as the target parameter of an additional thread.
+  
+  Args:
+    timeout (int): Number of seconds to timeout.
+  """
 
-  reset = False
-  timedout = False
+  global timer_reset
+  global timer_timedout
+
+  timer_reset = False
+  timer_timedout = False
   counter = timeout
 
   while 1:
@@ -14,20 +20,20 @@ def timer(timeout):
     counter -= 1
 
     if counter == 0:
-      timedout = True
+      timer_timedout = True
       break
 
-    if reset:
+    if timer_reset:
       counter = timeout
-      reset = False
+      timer_reset = False
 
 def reset_timer():
-  global reset
-  reset = True
+  global timer_reset
+  timer_reset = True
 
 def maybe_timeout(db):
-  global timedout
-  if timedout:
+  global timer_timedout
+  if timer_timedout:
       print('\033[91m' + f"[-] You took too long and timed out! Please start the program again." + '\033[0m')
       db.close()
       sys.exit()
