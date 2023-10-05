@@ -29,7 +29,7 @@ Install all of the required dependencies using `pip`.
 pip install -r requirements.txt
 ```
 
-Finally, define the required environment variables. For the secret key, use a 30 character long sequence of random characters (uppercase, lowercase and numbers). You can use [RANDOM.org](https://www.random.org/strings/?num=5&len=30&digits=on&upperalpha=on&loweralpha=on&unique=on&format=html&rnd=new) to generate such a sequence.
+Finally, define the required environment variables. For `SECRET_KEY`, use a 30 character long sequence of random characters (uppercase, lowercase and numbers). You can use [RANDOM.org](https://www.random.org/strings/?num=5&len=30&digits=on&upperalpha=on&loweralpha=on&unique=on&format=html&rnd=new) to generate such a sequence.
 
 ```bash
 DB_HOST="host"
