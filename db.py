@@ -1,3 +1,4 @@
+from dotenv import dotenv_values
 from getpass import getpass
 import psycopg2
 import inquirer
@@ -18,19 +19,20 @@ class Database:
     );          
     """)
     self.cur.execute("""CREATE TABLE IF NOT EXISTS secret (
-                master_password VARCHAR(255)
+                key VARCHAR(255),
+                value VARCHAR(255)
     );          
     """)
     self.conn.commit()
   
   def get_master_password(self):
-    self.cur.execute("""SELECT master_password FROM secret;""")
+    self.cur.execute("""SELECT * FROM secret WHERE key = 'master_password';""")
     self.conn.commit()
     master_password_hash = self.cur.fetchall()
     if not master_password_hash:
       return None
     else:
-      return master_password_hash[0][0].encode()
+      return master_password_hash[0][1]
 
   def set_master_password(self):
     while True:
@@ -42,9 +44,35 @@ class Database:
     hash = bcrypt.hashpw(master_password.encode(), salt)
 
     # Decode hash before we store it
-    sql = self.cur.mogrify("""INSERT INTO secret (master_password) VALUES (%s)""", (hash.decode(),))
+    sql = self.cur.mogrify("""INSERT INTO secret (key, value) VALUES ('master_password', %s)""", (hash.decode(),))
     self.cur.execute(sql)
     self.conn.commit()
+  
+  def get_secret_key(self):
+    self.cur.execute("""SELECT * FROM secret WHERE key = 'secret_key';""")
+    self.conn.commit()
+    secret_key = self.cur.fetchall()
+    if not secret_key:
+      return None
+    else:
+      return secret_key[0][0]
+
+  def set_secret_key(self):
+    env = dotenv_values('.env')
+    try:
+      secret_key = env["SECRET_KEY"]
+
+      # Raise Exception if secret key isn't valid
+      if len(secret_key) != 30:
+        raise Exception
+      
+      # Store the secret key into database
+      sql = self.cur.mogrify("""INSERT INTO secret (key, value) VALUES ('secret_key', %s)""", (secret_key,))
+      self.cur.execute(sql)
+      self.conn.commit()
+
+    except:
+      raise Exception("Failed to set secret key into the database. Make sure you have specified a valid secret key in your .env file")
   
   def close(self):
     self.cur.close()

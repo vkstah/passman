@@ -23,12 +23,16 @@ def main(
   if not db.get_master_password():
     db.set_master_password()
   
+  # Set secret key if it's not set already
+  if not db.get_secret_key():
+    db.set_secret_key()
+  
   # Get the master password and compare it to the hashed one from storage
   master_password_hash = db.get_master_password()
   while True:
     print()
     master_password = inquirer.password(message="Enter Master Password")
-    if bcrypt.checkpw(master_password.encode(), master_password_hash):
+    if bcrypt.checkpw(master_password.encode(), master_password_hash.encode()):
       print()
       break
     else:
