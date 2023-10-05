@@ -4,7 +4,7 @@ Vault is a lightweight and ultra-simple password manager built with Python for m
 
 ## Features
 
-Vault allows you to create a centralized and locally hosted vault for all your passwords that can be accessed using a master password. In addition to the master password, a secret key (sometimes called device secret) is also required, to add an additional layer of security.
+Vault allows you to create a centralized and locally hosted vault for all your passwords that can be accessed using a master password. In addition to the master password, a secret key (sometimes called device secret) is also required in order to add an additional layer of security to the mix.
 
 - Add, edit or remove credentials (username, password)
 - Copy credentials to clipboard without ever displaying them on the terminal
