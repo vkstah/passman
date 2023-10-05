@@ -8,7 +8,7 @@ Vault allows you to create a centralized and locally hosted vault for all your p
 
 - Add, edit or remove credentials (username, password)
 - Copy credentials to clipboard without ever displaying them on the terminal
-- Automatic script timeout after X amount of seconds for additional security
+- Automatic script timeout after 90 seconds for additional security. The timeout can be modified as specified in [Arguments](#arguments)
 - Stores AES encrypted credentials into a [PostgreSQL](https://www.postgresql.org/) database
 
 ## Requirements
@@ -43,6 +43,16 @@ SECRET_KEY="hUmbfgDF6WLD3OVLfcNv2bTLVYQIaq" # You can remove this after you've s
 ## Usage
 
 Under construction. 🔧
+
+## Arguments
+
+### Timeout
+
+You can use the `--timeout` flag to specify the amount of idle seconds you want the program to timeout in.
+
+```bash
+python main.py --timeout 30
+```
 
 ## Furthermore
 
