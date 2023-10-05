@@ -19,11 +19,11 @@ def main(
   # Establish connection to database
   db = Database(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
 
-  # Set the master password
+  # Set the master password if it's not set already
   if not db.get_master_password():
     db.set_master_password()
   
-  # Check the master password
+  # Get the master password and compare it to the hashed one from storage
   master_password_hash = db.get_master_password()
   while True:
     print()
@@ -73,25 +73,35 @@ def view(db):
       entry(entry=choice, db=db)
 
 def entry(entry, db):
-  choices = [("Username", "username"), ("Password", "password"), ("Back", "back")]
+  choices = [
+    ("Copy Username", "copy_username"),
+    ("Copy Password", "copy_password"),
+    ("Edit Username", "edit_username"),
+    ("Edit Password", "edit_password"),
+    ("Delete", "delete"),
+    ("Back", "back")
+  ]
   while True:
 
     # Reset timer and maybe timeout after choice
     reset_timer()
-    choice = inquirer.list_input(f"Copy {entry[1]}", choices=choices)
+    choice = inquirer.list_input(f"Perform action with {entry[1]}", choices=choices)
     maybe_timeout(db)
 
     # Handle choice
     if choice == 'back':
       break
-    elif choice == 'username':
+    elif choice == 'copy_username':
       pyperclip.copy("Implement me!")
       print('\033[92m' + f'[+] Copied Username to clipboard!' + '\033[0m')
       print()
-    elif choice == 'password':
+    elif choice == 'copy_password':
       pyperclip.copy(entry[2])
       print('\033[92m' + f'[+] Copied Password to clipboard!' + '\033[0m')
       print()
+
+def new(db):
+  pass
 
 # Bootstrap the program
 if __name__ == "__main__":
