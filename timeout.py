@@ -28,6 +28,6 @@ def reset_timer():
 def maybe_timeout(db):
   global timedout
   if timedout:
-      print('\033[91m' + f"Timed out. Please start the program again." + '\033[0m')
+      print('\033[91m' + f"[-] You took too long and timed out! Please start the program again." + '\033[0m')
       db.close()
       sys.exit()

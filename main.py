@@ -3,12 +3,12 @@ from db import Database
 import threading
 import pyperclip
 import inquirer
-import threads
+from timeout import timer, reset_timer, maybe_timeout
+import bcrypt
 import typer
 import sys
 
 def main(
-  master_password: str = typer.Option(..., prompt="Master Password", hide_input=True),
   timeout: int = 90
 ):
   # Bail if no .env is found
@@ -19,17 +19,31 @@ def main(
   # Establish connection to database
   db = Database(host=env['DB_HOST'], dbname=env['DB_NAME'], user=env['DB_USER'], password=env['DB_PASSWORD'], port=env['DB_PORT'])
 
+  # Set the master password
+  if not db.get_master_password():
+    db.set_master_password()
+  
+  # Check the master password
+  master_password_hash = db.get_master_password()
+  while True:
+    print()
+    master_password = inquirer.password(message="Enter Master Password")
+    if bcrypt.checkpw(master_password.encode(), master_password_hash):
+      print()
+      break
+    else:
+      print('\033[91m' + f"[-] Incorrect password. Please try again." + '\033[0m')
+
   # Create timer thread to timeout the program after X amount of seconds
-  timer_thread = threading.Thread(target=threads.timer, daemon=True, args=(timeout,))
+  timer_thread = threading.Thread(target=timer, daemon=True, args=(timeout,))
   timer_thread.start()
 
   choices=[('View all passwords', 'view'), ('Add new password', 'new'), ('Exit', 'exit')]
   while True:
-
     # Reset timer and maybe timeout after choice
-    threads.reset_timer()
+    reset_timer()
     choice = inquirer.list_input("What would you like to do?", choices=choices)
-    threads.maybe_timeout(db)
+    maybe_timeout(db)
 
     # Handle choice
     if choice == 'view':
@@ -48,9 +62,9 @@ def view(db):
   while True:
 
     # Reset timer and maybe timeout after choice
-    threads.reset_timer()
+    reset_timer()
     choice = inquirer.list_input("Please select an entry", choices=choices)
-    threads.maybe_timeout(db)
+    maybe_timeout(db)
 
     # Handle choice
     if choice == 'Back':
@@ -63,20 +77,20 @@ def entry(entry, db):
   while True:
 
     # Reset timer and maybe timeout after choice
-    threads.reset_timer()
+    reset_timer()
     choice = inquirer.list_input(f"Copy {entry[1]}", choices=choices)
-    threads.maybe_timeout(db)
+    maybe_timeout(db)
 
     # Handle choice
     if choice == 'back':
       break
     elif choice == 'username':
       pyperclip.copy("Implement me!")
-      print('\033[92m' + f'Copied Username to clipboard!' + '\033[0m')
+      print('\033[92m' + f'[+] Copied Username to clipboard!' + '\033[0m')
       print()
     elif choice == 'password':
       pyperclip.copy(entry[2])
-      print('\033[92m' + f'Copied Password to clipboard!' + '\033[0m')
+      print('\033[92m' + f'[+] Copied Password to clipboard!' + '\033[0m')
       print()
 
 # Bootstrap the program
