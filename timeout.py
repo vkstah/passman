@@ -38,8 +38,9 @@ def reset_timer():
 def maybe_timeout(db):
   """Maybe timeouts the program.
   
-  This function will check if the timer function has flagged the program as timed out. If that is the case,
-  this function will also perform some cleanup tasks and exit the program.
+  This function will check if the timer function has flagged the program as
+  timed out. If that is the case, this function will also perform some cleanup
+  tasks and exit the program.
 
   Args:
     db (Database): The database instance.
