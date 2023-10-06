@@ -48,7 +48,7 @@ Under construction. 🔧
 
 ### Timeout
 
-You can use the `--timeout` flag to specify the amount of idle seconds you want the program to timeout in.
+You can use the `--timeout` flag to specify the amount of idle seconds you want the program to timeout in. Default: 90.
 
 ```bash
 python vault.py --timeout 30
