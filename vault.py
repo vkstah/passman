@@ -100,7 +100,7 @@ def view_entry(entry, db, master_password):
     pyperclip.copy(entry[2])
     print('\033[92m' + f'[+] Copied Username to clipboard!' + '\033[0m')
     print()
-    view_entry(entry, db)
+    view_entry(entry, db, master_password=master_password)
   elif choice == 'copy_password':
     vault_key = encryption.compute_vault_key(master_password)
     decrypted_password = encryption.decrypt(key=vault_key, source=entry[3])
