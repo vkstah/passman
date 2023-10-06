@@ -74,6 +74,17 @@ class Database:
     except:
       raise Exception("Failed to set secret key into the database. Make sure you have specified a valid secret key in your .env file")
   
+  def get_all_passwords(self):
+    self.cur.execute("""SELECT * FROM password;""")
+    self.conn.commit()
+    return self.cur.fetchall()
+
+  def get_password(self, id):
+    sql = self.cur.mogrify("""SELECT * FROM password WHERE 'id' = %s;""", (hash.decode(),))
+    self.cur.execute(sql)
+    self.conn.commit()
+    return self.cur.fetchall()[0]
+  
   def close(self):
     self.cur.close()
     self.conn.close()

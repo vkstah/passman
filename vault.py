@@ -1,9 +1,11 @@
+from timeout import timer, reset_timer, maybe_timeout
 from dotenv import dotenv_values
+from utils import clear
 from db import Database
+import encryption
 import threading
 import pyperclip
 import inquirer
-from timeout import timer, reset_timer, maybe_timeout
 import bcrypt
 import typer
 import sys
@@ -51,12 +53,14 @@ def main(
 
     # Handle choice
     if choice == 'view':
-      view(db)
+      view_all(db=db, master_password=master_password)
+    elif choice == 'new':
+      new_entry(db=db, master_password=master_password)
     elif choice == 'exit':
       db.close()
       break
 
-def view(db):
+def view_all(db, master_password):
 
   # Fetch all passwords from database.
   db.cur.execute("""SELECT * FROM password;""")
@@ -74,9 +78,12 @@ def view(db):
     if choice == 'Back':
       break
     else:
-      entry(entry=choice, db=db)
+      view_entry(entry=choice, db=db, master_password=master_password)
 
-def entry(entry, db):
+def view_entry(entry, db, master_password):
+
+  # Reset timer and maybe timeout after choice
+  reset_timer()
   choices = [
     ("Copy Username", "copy_username"),
     ("Copy Password", "copy_password"),
@@ -85,27 +92,63 @@ def entry(entry, db):
     ("Delete", "delete"),
     ("Back", "back")
   ]
+  choice = inquirer.list_input(f"Perform action with {entry[1]}", choices=choices)
+  maybe_timeout(db)
+
+  # Handle choice
+  if choice == 'copy_username':
+    pyperclip.copy(entry[2])
+    print('\033[92m' + f'[+] Copied Username to clipboard!' + '\033[0m')
+    print()
+    view_entry(entry, db)
+  elif choice == 'copy_password':
+    vault_key = encryption.compute_vault_key(master_password)
+    decrypted_password = encryption.decrypt(key=vault_key, source=entry[3])
+    pyperclip.copy(encryption.decrypt(key=vault_key, source=entry[3]).decode())
+    print('\033[92m' + f'[+] Copied Password to clipboard!' + '\033[0m')
+    print()
+    view_entry(entry=entry, db=db, master_password=master_password)
+
+def new_entry(db, master_password):
+
+  # Get the name of the entry
+  entries = db.get_all_passwords()
   while True:
-
-    # Reset timer and maybe timeout after choice
     reset_timer()
-    choice = inquirer.list_input(f"Perform action with {entry[1]}", choices=choices)
+    name = inquirer.text(message="Enter the name of the entry")
     maybe_timeout(db)
-
-    # Handle choice
-    if choice == 'back':
+    found = False
+    for entry in entries:
+      if name in entry:
+        found = True
+        break
+    if not found:
       break
-    elif choice == 'copy_username':
-      pyperclip.copy("Implement me!")
-      print('\033[92m' + f'[+] Copied Username to clipboard!' + '\033[0m')
-      print()
-    elif choice == 'copy_password':
-      pyperclip.copy(entry[2])
-      print('\033[92m' + f'[+] Copied Password to clipboard!' + '\033[0m')
-      print()
+    else:
+      print('\033[91m' + f"[-] Duplicate name. Please choose a different name." + '\033[0m')
 
-def new(db):
-  pass
+  # Get the username
+  reset_timer()
+  username = inquirer.text(message="Enter the Username")
+  maybe_timeout(db)
+
+  # Get the password
+  reset_timer()
+  password = inquirer.password(message="Enter the Password")
+  maybe_timeout(db)
+
+  # Encrypt the password
+  vault_key = encryption.compute_vault_key(master_password)
+  encrypted_password = encryption.encrypt(key=vault_key, source=password)
+
+  # Run the query to store the entry
+  sql = db.cur.mogrify("""INSERT INTO password ("name", "username", "password") VALUES (%s, %s, %s);""", (name, username, encrypted_password))
+  db.cur.execute(sql)
+  db.conn.commit()
+
+  print()
+  print('\033[92m' + f'[+] Stored new entry: {name}' + '\033[0m')
+  print()
 
 # Bootstrap the program
 if __name__ == "__main__":
