@@ -51,7 +51,7 @@ Under construction. 🔧
 You can use the `--timeout` flag to specify the amount of idle seconds you want the program to timeout in.
 
 ```bash
-python main.py --timeout 30
+python vault.py --timeout 30
 ```
 
 ## Furthermore
