@@ -1,5 +1,5 @@
 from dotenv import dotenv_values
-from getpass import getpass
+from entities import Entry
 import psycopg2
 import inquirer
 import bcrypt
@@ -75,15 +75,22 @@ class Database:
       raise Exception("Failed to set secret key into the database. Make sure you have specified a valid secret key in your .env file")
   
   def get_all_passwords(self):
-    self.cur.execute("""SELECT * FROM password;""")
+    self.cur.execute("""SELECT * FROM password ORDER BY id;""")
     self.conn.commit()
-    return self.cur.fetchall()
+    return list(map(lambda x: Entry(x), self.cur.fetchall()))
 
   def get_password(self, id):
-    sql = self.cur.mogrify("""SELECT * FROM password WHERE 'id' = %s;""", (hash.decode(),))
+    sql = self.cur.mogrify("""SELECT * FROM password WHERE id = %s;""", (id,))
     self.cur.execute(sql)
     self.conn.commit()
-    return self.cur.fetchall()[0]
+    result = self.cur.fetchall()
+    return Entry(result[0]) if len(result) > 0 else None
+  
+  def is_name_unique(self, name):
+    sql = self.cur.mogrify("""SELECT * FROM password WHERE name = %s;""", (name,))
+    self.cur.execute(sql)
+    self.conn.commit()
+    return True if len(self.cur.fetchall()) == 0 else False
   
   def close(self):
     self.cur.close()
