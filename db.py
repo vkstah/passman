@@ -37,7 +37,7 @@ class Database:
   def set_master_password(self):
     while True:
       master_password = inquirer.password(message="Set your Master Password")
-      if master_password == inquirer.password(message="Re-enter") and master_password != "":
+      if master_password == inquirer.password(message="Re-enter Master Password") and master_password != "":
         break
       print("Please try again.")
     salt = bcrypt.gensalt()

@@ -13,7 +13,12 @@ def edit_username(entry, db):
     maybe_timeout(db)
 
     # Validate the new username
-    if len(new_username) > 0: break
+    if not len(new_username) > 0:
+      print('\033[91m' + f"[-] Username cannot be empty." + '\033[0m')
+      continue
+
+    # Break from loop if all checks have passed
+    break
   
   # Edit the username column
   sql = db.cur.mogrify("""UPDATE password SET username = %s WHERE id = %s;""", (new_username, entry.get_id()))
@@ -21,5 +26,5 @@ def edit_username(entry, db):
   db.conn.commit()
   
   print()
-  print('\033[92m' + f'[+] New Username for {entry.get_name()}: {new_username}' + '\033[0m')
+  print('\033[92m' + f'[+] Updated Username for {entry.get_name()}!' + '\033[0m')
   print()

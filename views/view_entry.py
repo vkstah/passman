@@ -1,10 +1,12 @@
 from timeout import reset_timer, maybe_timeout
-from views import edit_username
+from views import edit_username, edit_password
 import encryption
 import pyperclip
 import inquirer
 
 def view_entry(id, db, master_password):
+
+  # Fetch a fresh entry from database
   entry = db.get_password(id)
 
   # Reset timer and maybe timeout after choice
@@ -39,4 +41,9 @@ def view_entry(id, db, master_password):
   # Edit username
   elif choice == 'edit_username':
     edit_username(entry=entry, db=db)
+    view_entry(id=id, db=db, master_password=master_password)
+  
+  # Edit password
+  elif choice == 'edit_password':
+    edit_password(entry=entry, db=db, master_password=master_password)
     view_entry(id=id, db=db, master_password=master_password)
