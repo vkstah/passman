@@ -5,14 +5,16 @@ import inquirer
 def new_entry(db, master_password):
 
   # Get the name of the entry
-  entries = db.get_all_passwords()
+  entries = db.get_all_entries()
   while True:
     reset_timer()
     name = inquirer.text(message="Enter the name of the entry")
     maybe_timeout(db)
+    
+    # Make sure there aren't any duplicate names
     found = False
     for entry in entries:
-      if name in entry:
+      if entry.get_name() == name:
         found = True
         break
     if not found:

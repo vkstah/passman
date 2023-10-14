@@ -26,12 +26,11 @@ def main(
   if not db.get_secret_key():
     db.set_secret_key()
   
-  # Get the master password and compare it to the hashed one from storage
-  master_password_hash = db.get_master_password()
+  # Check validity of master password
   while True:
     print()
     master_password = inquirer.password(message="Enter Master Password")
-    if bcrypt.checkpw(master_password.encode(), master_password_hash.encode()):
+    if db.check_master_password(master_password):
       print()
       break
     else:
@@ -43,6 +42,7 @@ def main(
 
   choices=[('View all passwords', 'view'), ('Add new password', 'new'), ('Exit', 'exit')]
   while True:
+
     # Reset timer and maybe timeout after choice
     reset_timer()
     choice = inquirer.list_input("What would you like to do?", choices=choices)

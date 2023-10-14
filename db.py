@@ -74,23 +74,30 @@ class Database:
     except:
       raise Exception("Failed to set secret key into the database. Make sure you have specified a valid secret key in your .env file")
   
-  def get_all_passwords(self):
+  def check_master_password(self, master_password):
+    master_password_hash = self.get_master_password()
+    if bcrypt.checkpw(master_password.encode(), master_password_hash.encode()):
+      return True
+    else:
+      return False
+  
+  def get_all_entries(self):
     self.cur.execute("""SELECT * FROM password ORDER BY id;""")
     self.conn.commit()
     return list(map(lambda x: Entry(x), self.cur.fetchall()))
 
-  def get_password(self, id):
+  def get_entry(self, id):
     sql = self.cur.mogrify("""SELECT * FROM password WHERE id = %s;""", (id,))
     self.cur.execute(sql)
     self.conn.commit()
     result = self.cur.fetchall()
     return Entry(result[0]) if len(result) > 0 else None
-  
-  def is_name_unique(self, name):
-    sql = self.cur.mogrify("""SELECT * FROM password WHERE name = %s;""", (name,))
+
+  def delete_entry(self, id):
+    sql = self.cur.mogrify("""DELETE FROM password WHERE id = %s;""", (id,))
     self.cur.execute(sql)
     self.conn.commit()
-    return True if len(self.cur.fetchall()) == 0 else False
+    return True
   
   def close(self):
     self.cur.close()

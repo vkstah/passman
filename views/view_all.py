@@ -4,14 +4,14 @@ import inquirer
 
 def view_all(db, master_password):
 
-  # Fetch all entries from database
-  entries = db.get_all_passwords()
-
-  choices = list(map(lambda entry: (entry.get_name(), entry), entries)) + ['Back']
   while True:
+
+    # Fetch all entries from database
+    entries = db.get_all_entries()
 
     # Reset timer and maybe timeout after choice
     reset_timer()
+    choices = list(map(lambda entry: (entry.get_name(), entry), entries)) + ['Back']
     choice = inquirer.list_input("Please select an entry", choices=choices)
     maybe_timeout(db)
 
