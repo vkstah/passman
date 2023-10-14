@@ -50,3 +50,7 @@ def view_entry(id, db, master_password):
     elif choice == 'delete_entry':
       delete_entry(entry=entry, db=db)
       break
+
+    # Back
+    elif choice == 'back':
+      break

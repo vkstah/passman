@@ -62,6 +62,5 @@ def edit_password(entry, db, master_password):
   db.cur.execute(sql)
   db.conn.commit()
 
-  print()
   print('\033[92m' + f'[+] Updated Password for {entry.get_name()}!' + '\033[0m')
   print()

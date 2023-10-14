@@ -25,6 +25,5 @@ def edit_username(entry, db):
   db.cur.execute(sql)
   db.conn.commit()
   
-  print()
   print('\033[92m' + f'[+] Updated Username for {entry.get_name()}!' + '\033[0m')
   print()
